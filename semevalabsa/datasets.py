@@ -39,7 +39,7 @@ class Sentence:
 		return s
 
 
-class SentenceLevelOpinion:
+class Opinion:
 	def __init__(self):
 		self.target = None
 		self.category = None
@@ -54,17 +54,6 @@ class SentenceLevelOpinion:
 			return "[{}; {}] '{}' ({}-{})".format(self.category, self.polarity, self.target, self.start, self.end)
 		else:
 			return "[{}; {}]".format(self.category, self.polarity)
-
-
-class TextLevelOpinions:
-	def __init__(self):
-		self.category = None
-		self.entity = None
-		self.attribute = None
-		self.polarity = None
-
-	def __str__(self):
-		return "[{}; {}]".format(self.category, self.polarity)
 
 
 def read_semeval2015_task12(filename):
@@ -84,7 +73,7 @@ def read_semeval2015_task12(filename):
 
 				opinion_tags = s_tag.find_all("Opinion")
 				for o_tag in opinion_tags:
-					opinion = SentenceLevelOpinion()
+					opinion = Opinion()
 					opinion.category = o_tag["category"]
 					opinion.entity, opinion.attribute = opinion.category.split("#")
 					opinion.polarity = o_tag["polarity"]
@@ -121,7 +110,7 @@ def read_semeval2016_task5_subtask1(filename):
 
 				opinion_tags = s_tag.find_all("Opinion")
 				for o_tag in opinion_tags:
-					opinion = SentenceLevelOpinion()
+					opinion = Opinion()
 					opinion.category = o_tag["category"]
 					opinion.entity, opinion.attribute = opinion.category.split("#")
 					opinion.polarity = o_tag["polarity"]
@@ -159,7 +148,7 @@ def read_semeval2016_task5_subtask2(filename):
 
 			opinion_tags = r_tag.find_all("Opinion")
 			for o_tag in opinion_tags:
-				opinion = SentenceLevelOpinion()
+				opinion = Opinion()
 				opinion.category = o_tag["category"]
 				opinion.entity, opinion.attribute = opinion.category.split("#")
 				opinion.polarity = o_tag["polarity"]

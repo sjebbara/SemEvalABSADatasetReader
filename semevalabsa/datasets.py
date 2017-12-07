@@ -73,7 +73,7 @@ def read_semeval2014_task4(filepath, aspect_terms=True, aspect_categories=True):
 
             sentence.review_id = review.id
             sentence.text = s_tag.find("text").get_text()
-            
+
             if aspect_terms:
                 aspect_term_tags = s_tag.find_all("aspectTerm")
                 for a_tag in aspect_term_tags:

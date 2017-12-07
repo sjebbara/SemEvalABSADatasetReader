@@ -58,9 +58,9 @@ class Opinion:
         return s.encode("utf-8")
 
 
-def read_semeval2014_task4(filename):
+def read_semeval2014_task4(filepath, aspect_terms=True, aspect_categories=True):
     reviews = []
-    with open(filename) as f:
+    with open(filepath) as f:
         soup = BeautifulSoup(f, "xml")
         sentence_tags = soup.find_all("sentence")
         for s_tag in sentence_tags:
@@ -73,37 +73,64 @@ def read_semeval2014_task4(filename):
 
             sentence.review_id = review.id
             sentence.text = s_tag.find("text").get_text()
-            aspect_term_tags = s_tag.find_all("aspectTerm")
-            for a_tag in aspect_term_tags:
-                opinion = Opinion()
+            
+            if aspect_terms:
+                aspect_term_tags = s_tag.find_all("aspectTerm")
+                for a_tag in aspect_term_tags:
+                    opinion = Opinion()
 
-                opinion.category = None
-                opinion.entity = None
-                opinion.attribute = None
+                    opinion.category = None
+                    opinion.entity = None
+                    opinion.attribute = None
 
-                try:
-                    opinion.polarity = a_tag["polarity"]
-                except KeyError as e:
-                    opinion.polarity = None
+                    try:
+                        opinion.polarity = a_tag["polarity"]
+                    except KeyError:
+                        opinion.polarity = None
 
-                try:
-                    opinion.target = a_tag["term"]
-                    if opinion.target == "NULL":
-                        opinion.target = None
-                    else:
-                        opinion.start = int(a_tag["from"])
-                        opinion.end = int(a_tag["to"])
-                except KeyError as e:
-                    pass
-                sentence.opinions.append(opinion)
+                    try:
+                        opinion.target = a_tag["term"]
+                        if opinion.target == "NULL":
+                            opinion.target = None
+                        else:
+                            opinion.start = int(a_tag["from"])
+                            opinion.end = int(a_tag["to"])
+                    except KeyError:
+                        pass
+                    sentence.opinions.append(opinion)
+
+            if aspect_categories:
+                aspect_category_tags = s_tag.find_all("aspectCategory")
+                for c_tag in aspect_category_tags:
+                    opinion = Opinion()
+
+                    try:
+                        opinion.category = c_tag["category"]
+                        opinion.entity, opinion.attribute = opinion.category.split("#")
+                    except KeyError:
+                        opinion.category = None
+                        opinion.entity = None
+                        opinion.attribute = None
+
+                    try:
+                        opinion.polarity = c_tag["polarity"]
+                    except KeyError:
+                        opinion.polarity = None
+
+                    opinion.target = None
+                    opinion.start = 0
+                    opinion.end = 0
+
+                    sentence.opinions.append(opinion)
+
             review.sentences.append(sentence)
             reviews.append(review)
     return reviews
 
 
-def read_semeval2015_task12(filename):
+def read_semeval2015_task12(filepath):
     reviews = []
-    with open(filename) as f:
+    with open(filepath) as f:
         soup = BeautifulSoup(f, "xml")
         review_tags = soup.find_all("Review")
         for j, r_tag in enumerate(review_tags):
@@ -122,14 +149,14 @@ def read_semeval2015_task12(filename):
                     try:
                         opinion.category = o_tag["category"]
                         opinion.entity, opinion.attribute = opinion.category.split("#")
-                    except KeyError as e:
+                    except KeyError:
                         opinion.category = None
                         opinion.entity = None
                         opinion.attribute = None
 
                     try:
                         opinion.polarity = o_tag["polarity"]
-                    except KeyError as e:
+                    except KeyError:
                         opinion.polarity = None
 
                     try:
@@ -139,7 +166,7 @@ def read_semeval2015_task12(filename):
                         else:
                             opinion.start = int(o_tag["from"])
                             opinion.end = int(o_tag["to"])
-                    except KeyError as e:
+                    except KeyError:
                         pass
                     sentence.opinions.append(opinion)
                 review.sentences.append(sentence)
@@ -147,9 +174,9 @@ def read_semeval2015_task12(filename):
     return reviews
 
 
-def read_semeval2016_task5_subtask1(filename):
+def read_semeval2016_task5_subtask1(filepath):
     reviews = []
-    with open(filename) as f:
+    with open(filepath) as f:
         soup = BeautifulSoup(f, "xml")
         review_tags = soup.find_all("Review")
         for j, r_tag in enumerate(review_tags):
@@ -163,7 +190,7 @@ def read_semeval2016_task5_subtask1(filename):
                 sentence.text = s_tag.find("text").get_text()
                 try:
                     sentence.out_of_scope = s_tag["OutOfScope"]
-                except KeyError as e:
+                except KeyError:
                     sentence.out_of_scope = False
 
                 opinion_tags = s_tag.find_all("Opinion")
@@ -172,14 +199,14 @@ def read_semeval2016_task5_subtask1(filename):
                     try:
                         opinion.category = o_tag["category"]
                         opinion.entity, opinion.attribute = opinion.category.split("#")
-                    except KeyError as e:
+                    except KeyError:
                         opinion.category = None
                         opinion.entity = None
                         opinion.attribute = None
 
                     try:
                         opinion.polarity = o_tag["polarity"]
-                    except KeyError as e:
+                    except KeyError:
                         opinion.polarity = None
 
                     try:
@@ -189,7 +216,7 @@ def read_semeval2016_task5_subtask1(filename):
                         else:
                             opinion.start = int(o_tag["from"])
                             opinion.end = int(o_tag["to"])
-                    except KeyError as e:
+                    except KeyError:
                         pass
                     sentence.opinions.append(opinion)
                 review.sentences.append(sentence)
@@ -197,9 +224,9 @@ def read_semeval2016_task5_subtask1(filename):
     return reviews
 
 
-def read_semeval2016_task5_subtask2(filename):
+def read_semeval2016_task5_subtask2(filepath):
     reviews = []
-    with open(filename) as f:
+    with open(filepath) as f:
         soup = BeautifulSoup(f, "xml")
         review_tags = soup.find_all("Review")
         for j, r_tag in enumerate(review_tags):
@@ -219,13 +246,13 @@ def read_semeval2016_task5_subtask2(filename):
                 try:
                     opinion.category = o_tag["category"]
                     opinion.entity, opinion.attribute = opinion.category.split("#")
-                except KeyError as e:
+                except KeyError:
                     opinion.category = None
                     opinion.entity = None
                     opinion.attribute = None
                 try:
                     opinion.polarity = o_tag["polarity"]
-                except KeyError as e:
+                except KeyError:
                     opinion.polarity = None
                 review.opinions.append(opinion)
             reviews.append(review)

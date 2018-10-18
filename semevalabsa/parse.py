@@ -1,78 +1,14 @@
-from typing import List, Optional
-
 from bs4 import BeautifulSoup
+
+from semevalabsa.datatypes import Review, Sentence, Opinion, Dataset, DatasetFormat
 
 __author__ = 'sjebbara'
 
 
-class Review:
-    def __init__(self):
-        self.id = None  # type: str
-        self.sentences = []  # type:  List[Sentence]
-        self.opinions = []  # type:  List[Opinion]
-
-    def __repr__(self):
-        return str(self.__dict__)
-
-    def __str__(self):
-        s = u"--- Review [{}] ---".format(self.id)
-        s += u"\nSentences:"
-        for sentence in self.sentences:
-            s += u"\n  " + str(sentence)
-
-        if self.opinions:
-            s += u"\nText-Level Opinions:"
-            for opinion in self.opinions:
-                s += u"\n  " + str(opinion)
-        return s
-
-
-class Sentence:
-    def __init__(self):
-        self.review_id = None  # type:  str
-        self.id = None  # type:  str
-        self.text = None  # type:  str
-        self.out_of_scope = False  # type:  bool
-        self.opinions = []  # type:  List[Sentence]
-
-    def __repr__(self):
-        return str(self.__dict__)
-
-    def __str__(self):
-        s = u"[{}]: '{}'".format(self.id, self.text)
-        if self.opinions:
-            s += u"\n  Sentence-Level Opinions:"
-            for o in self.opinions:
-                s += u"\n  " + str(o)
-            s += u"\n"
-        return s
-
-
-class Opinion:
-    def __init__(self):
-        self.target = None  # type:  Optional[str]
-        self.category = None  # type:  Optional[str]
-        self.entity = None  # type:  Optional[str]
-        self.attribute = None  # type:  Optional[str]
-        self.polarity = None  # type:  Optional[str]
-        self.start = None  # type:  int
-        self.end = None  # type:  int
-
-    def __repr__(self):
-        return str(self.__dict__)
-
-    def __str__(self):
-        if self.target:
-            s = u"[{}; {}] '{}' ({}-{})".format(self.category, self.polarity, self.target, self.start, self.end)
-        else:
-            s = u"[{}; {}]".format(self.category, self.polarity)
-        return s
-
-
-def read_semeval2014_task4(filepath: str, aspect_terms: bool = True, aspect_categories: bool = True) -> List[Review]:
+def read_semeval2014(filepath: str, aspect_terms: bool = True, aspect_categories: bool = True) -> Dataset:
     reviews = []
     with open(filepath) as f:
-        soup = BeautifulSoup(f, "xml")
+        soup = BeautifulSoup(f, features="xml")
         sentence_tags = soup.find_all("sentence")
         for s_tag in sentence_tags:
             sentence = Sentence()
@@ -117,9 +53,12 @@ def read_semeval2014_task4(filepath: str, aspect_terms: bool = True, aspect_cate
 
                     try:
                         opinion.category = c_tag["category"]
-                        opinion.entity, opinion.attribute = opinion.category.split("#")
                     except (KeyError, ValueError):
                         opinion.category = None
+
+                    try:
+                        opinion.entity, opinion.attribute = opinion.category.split("#")
+                    except (KeyError, ValueError):
                         opinion.entity = None
                         opinion.attribute = None
 
@@ -136,13 +75,13 @@ def read_semeval2014_task4(filepath: str, aspect_terms: bool = True, aspect_cate
 
             review.sentences.append(sentence)
             reviews.append(review)
-    return reviews
+    return Dataset(reviews, DatasetFormat.SemEval2014)
 
 
-def read_semeval2015_task12(filepath: str) -> List[Review]:
+def read_semeval2015(filepath: str) -> Dataset:
     reviews = []
     with open(filepath) as f:
-        soup = BeautifulSoup(f, "xml")
+        soup = BeautifulSoup(f, features="xml")
         review_tags = soup.find_all("Review")
         for j, r_tag in enumerate(review_tags):
             review = Review()
@@ -189,13 +128,50 @@ def read_semeval2015_task12(filepath: str) -> List[Review]:
                     sentence.opinions.append(opinion)
                 review.sentences.append(sentence)
             reviews.append(review)
-    return reviews
+    return Dataset(reviews, DatasetFormat.SemEval2015)
 
 
-def read_semeval2016_task5_subtask1(filepath: str) -> List[Review]:
+def read_semeval2016(filepath: str) -> Dataset:
     reviews = []
     with open(filepath) as f:
-        soup = BeautifulSoup(f, "xml")
+        soup = BeautifulSoup(f, features="xml")
+        review_tags = soup.find_all("Review")
+        for j, r_tag in enumerate(review_tags):
+            review = Review()
+            review.id = r_tag["rid"]
+            sentence_tags = r_tag.find_all("sentence")
+            for s_tag in sentence_tags:
+                sentence = Sentence()
+                sentence.review_id = review.id
+                sentence.id = s_tag["id"]
+                sentence.text = s_tag.find("text").get_text()
+                try:
+                    sentence.out_of_scope = s_tag["OutOfScope"]
+                except (KeyError, ValueError):
+                    sentence.out_of_scope = False
+
+                sentence_opinion_tags = s_tag.find("Opinions", recursive=False)
+                sentence_opinion_tags = sentence_opinion_tags.find_all("Opinion", recursive=False) if sentence_opinion_tags else []
+
+                for o_tag in sentence_opinion_tags:
+                    opinion = _build_opinion(o_tag)
+                    sentence.opinions.append(opinion)
+                review.sentences.append(sentence)
+
+            review_opinion_tags = r_tag.find("Opinions", recursive=False)
+            review_opinion_tags = review_opinion_tags.find_all("Opinion", recursive=False) if review_opinion_tags else []
+            for o_tag in review_opinion_tags:
+                opinion = _build_opinion(o_tag)
+                review.opinions.append(opinion)
+
+            reviews.append(review)
+    return Dataset(reviews, DatasetFormat.SemEval2016)
+
+
+def read_semeval2016_task5_subtask1(filepath: str) -> Dataset:
+    reviews = []
+    with open(filepath) as f:
+        soup = BeautifulSoup(f, features="xml")
         review_tags = soup.find_all("Review")
         for j, r_tag in enumerate(review_tags):
             review = Review()
@@ -213,47 +189,17 @@ def read_semeval2016_task5_subtask1(filepath: str) -> List[Review]:
 
                 opinion_tags = s_tag.find_all("Opinion")
                 for o_tag in opinion_tags:
-                    opinion = Opinion()
-                    # category
-                    try:
-                        opinion.category = o_tag["category"]
-                        opinion.entity, opinion.attribute = opinion.category.split("#")
-                    except (KeyError, ValueError):
-                        opinion.category = None
-
-                    # entity + attribute
-                    if opinion.category and "#" in opinion.category:
-                        opinion.entity, opinion.attribute = opinion.category.split("#")
-                    else:
-                        opinion.entity = None
-                        opinion.attribute = None
-
-                    # polarity
-                    try:
-                        opinion.polarity = o_tag["polarity"]
-                    except (KeyError, ValueError):
-                        opinion.polarity = None
-
-                    # target
-                    try:
-                        opinion.target = o_tag["target"]
-                        if opinion.target == "NULL":
-                            opinion.target = None
-                        else:
-                            opinion.start = int(o_tag["from"])
-                            opinion.end = int(o_tag["to"])
-                    except (KeyError, ValueError):
-                        pass
+                    opinion = _build_opinion(o_tag)
                     sentence.opinions.append(opinion)
                 review.sentences.append(sentence)
             reviews.append(review)
-    return reviews
+    return Dataset(reviews, DatasetFormat.SemEval2016)
 
 
-def read_semeval2016_task5_subtask2(filepath: str) -> List[Review]:
+def read_semeval2016_task5_subtask2(filepath: str) -> Dataset:
     reviews = []
     with open(filepath) as f:
-        soup = BeautifulSoup(f, "xml")
+        soup = BeautifulSoup(f, features="xml")
         review_tags = soup.find_all("Review")
         for j, r_tag in enumerate(review_tags):
             review = Review()
@@ -268,26 +214,43 @@ def read_semeval2016_task5_subtask2(filepath: str) -> List[Review]:
 
             opinion_tags = r_tag.find_all("Opinion")
             for o_tag in opinion_tags:
-                opinion = Opinion()
-                # category
-                try:
-                    opinion.category = o_tag["category"]
-                    opinion.entity, opinion.attribute = opinion.category.split("#")
-                except (KeyError, ValueError):
-                    opinion.category = None
-
-                # entity + attribute
-                if opinion.category and "#" in opinion.category:
-                    opinion.entity, opinion.attribute = opinion.category.split("#")
-                else:
-                    opinion.entity = None
-                    opinion.attribute = None
-
-                # polarity
-                try:
-                    opinion.polarity = o_tag["polarity"]
-                except (KeyError, ValueError):
-                    opinion.polarity = None
+                opinion = _build_opinion(o_tag)
                 review.opinions.append(opinion)
             reviews.append(review)
-    return reviews
+    return Dataset(reviews, DatasetFormat.SemEval2016)
+
+
+def _build_opinion(opinion_tag) -> Opinion:
+    opinion = Opinion()
+    # category
+    try:
+        opinion.category = opinion_tag["category"]
+        opinion.entity, opinion.attribute = opinion.category.split("#")
+    except (KeyError, ValueError):
+        opinion.category = None
+
+    # entity + attribute
+    if opinion.category and "#" in opinion.category:
+        opinion.entity, opinion.attribute = opinion.category.split("#")
+    else:
+        opinion.entity = None
+        opinion.attribute = None
+
+    # polarity
+    try:
+        opinion.polarity = opinion_tag["polarity"]
+    except (KeyError, ValueError):
+        opinion.polarity = None
+
+    # target
+    try:
+        opinion.target = opinion_tag["target"]
+        if opinion.target == "NULL":
+            opinion.target = None
+        else:
+            opinion.start = int(opinion_tag["from"])
+            opinion.end = int(opinion_tag["to"])
+    except (KeyError, ValueError):
+        pass
+
+    return opinion

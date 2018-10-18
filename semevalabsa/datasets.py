@@ -85,7 +85,7 @@ def read_semeval2014_task4(filepath, aspect_terms=True, aspect_categories=True):
 
                     try:
                         opinion.polarity = a_tag["polarity"]
-                    except KeyError:
+                    except (KeyError, ValueError):
                         opinion.polarity = None
 
                     try:
@@ -95,7 +95,7 @@ def read_semeval2014_task4(filepath, aspect_terms=True, aspect_categories=True):
                         else:
                             opinion.start = int(a_tag["from"])
                             opinion.end = int(a_tag["to"])
-                    except KeyError:
+                    except (KeyError, ValueError):
                         pass
                     sentence.opinions.append(opinion)
 
@@ -107,14 +107,14 @@ def read_semeval2014_task4(filepath, aspect_terms=True, aspect_categories=True):
                     try:
                         opinion.category = c_tag["category"]
                         opinion.entity, opinion.attribute = opinion.category.split("#")
-                    except KeyError:
+                    except (KeyError, ValueError):
                         opinion.category = None
                         opinion.entity = None
                         opinion.attribute = None
 
                     try:
                         opinion.polarity = c_tag["polarity"]
-                    except KeyError:
+                    except (KeyError, ValueError):
                         opinion.polarity = None
 
                     opinion.target = None
@@ -149,14 +149,14 @@ def read_semeval2015_task12(filepath):
                     try:
                         opinion.category = o_tag["category"]
                         opinion.entity, opinion.attribute = opinion.category.split("#")
-                    except KeyError:
+                    except (KeyError, ValueError):
                         opinion.category = None
                         opinion.entity = None
                         opinion.attribute = None
 
                     try:
                         opinion.polarity = o_tag["polarity"]
-                    except KeyError:
+                    except (KeyError, ValueError):
                         opinion.polarity = None
 
                     try:
@@ -166,7 +166,7 @@ def read_semeval2015_task12(filepath):
                         else:
                             opinion.start = int(o_tag["from"])
                             opinion.end = int(o_tag["to"])
-                    except KeyError:
+                    except (KeyError, ValueError):
                         pass
                     sentence.opinions.append(opinion)
                 review.sentences.append(sentence)
@@ -190,7 +190,7 @@ def read_semeval2016_task5_subtask1(filepath):
                 sentence.text = s_tag.find("text").get_text()
                 try:
                     sentence.out_of_scope = s_tag["OutOfScope"]
-                except KeyError:
+                except (KeyError, ValueError):
                     sentence.out_of_scope = False
 
                 opinion_tags = s_tag.find_all("Opinion")
@@ -199,14 +199,14 @@ def read_semeval2016_task5_subtask1(filepath):
                     try:
                         opinion.category = o_tag["category"]
                         opinion.entity, opinion.attribute = opinion.category.split("#")
-                    except KeyError:
+                    except (KeyError, ValueError):
                         opinion.category = None
                         opinion.entity = None
                         opinion.attribute = None
 
                     try:
                         opinion.polarity = o_tag["polarity"]
-                    except KeyError:
+                    except (KeyError, ValueError):
                         opinion.polarity = None
 
                     try:
@@ -216,7 +216,7 @@ def read_semeval2016_task5_subtask1(filepath):
                         else:
                             opinion.start = int(o_tag["from"])
                             opinion.end = int(o_tag["to"])
-                    except KeyError:
+                    except (KeyError, ValueError):
                         pass
                     sentence.opinions.append(opinion)
                 review.sentences.append(sentence)
@@ -246,13 +246,13 @@ def read_semeval2016_task5_subtask2(filepath):
                 try:
                     opinion.category = o_tag["category"]
                     opinion.entity, opinion.attribute = opinion.category.split("#")
-                except KeyError:
+                except (KeyError, ValueError):
                     opinion.category = None
                     opinion.entity = None
                     opinion.attribute = None
                 try:
                     opinion.polarity = o_tag["polarity"]
-                except KeyError:
+                except (KeyError, ValueError):
                     opinion.polarity = None
                 review.opinions.append(opinion)
             reviews.append(review)

@@ -146,14 +146,25 @@ def read_semeval2015_task12(filepath):
                 for o_tag in opinion_tags:
                     opinion = Opinion()
 
+                    # category
                     try:
                         opinion.category = o_tag["category"]
+<<<<<<< HEAD
                         opinion.entity, opinion.attribute = opinion.category.split("#")
                     except (KeyError, ValueError):
+=======
+                    except KeyError:
+>>>>>>> 56cd831b972820151a4820ba2f567e253cd3eec9
                         opinion.category = None
+
+                    # entity + attribute
+                    if opinion.category and "#" in opinion.category:
+                        opinion.entity, opinion.attribute = opinion.category.split("#")
+                    else:
                         opinion.entity = None
                         opinion.attribute = None
 
+                    # polarity
                     try:
                         opinion.polarity = o_tag["polarity"]
                     except (KeyError, ValueError):
@@ -196,19 +207,31 @@ def read_semeval2016_task5_subtask1(filepath):
                 opinion_tags = s_tag.find_all("Opinion")
                 for o_tag in opinion_tags:
                     opinion = Opinion()
+                    # category
                     try:
                         opinion.category = o_tag["category"]
+<<<<<<< HEAD
                         opinion.entity, opinion.attribute = opinion.category.split("#")
                     except (KeyError, ValueError):
+=======
+                    except KeyError:
+>>>>>>> 56cd831b972820151a4820ba2f567e253cd3eec9
                         opinion.category = None
+
+                    # entity + attribute
+                    if opinion.category and "#" in opinion.category:
+                        opinion.entity, opinion.attribute = opinion.category.split("#")
+                    else:
                         opinion.entity = None
                         opinion.attribute = None
 
+                    # polarity
                     try:
                         opinion.polarity = o_tag["polarity"]
                     except (KeyError, ValueError):
                         opinion.polarity = None
 
+                    # target
                     try:
                         opinion.target = o_tag["target"]
                         if opinion.target == "NULL":
@@ -243,13 +266,25 @@ def read_semeval2016_task5_subtask2(filepath):
             opinion_tags = r_tag.find_all("Opinion")
             for o_tag in opinion_tags:
                 opinion = Opinion()
+                # category
                 try:
                     opinion.category = o_tag["category"]
+<<<<<<< HEAD
                     opinion.entity, opinion.attribute = opinion.category.split("#")
                 except (KeyError, ValueError):
+=======
+                except KeyError:
+>>>>>>> 56cd831b972820151a4820ba2f567e253cd3eec9
                     opinion.category = None
+
+                # entity + attribute
+                if opinion.category and "#" in opinion.category:
+                    opinion.entity, opinion.attribute = opinion.category.split("#")
+                else:
                     opinion.entity = None
                     opinion.attribute = None
+
+                # polarity
                 try:
                     opinion.polarity = o_tag["polarity"]
                 except (KeyError, ValueError):

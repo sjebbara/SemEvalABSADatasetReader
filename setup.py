@@ -10,5 +10,5 @@ setup(name='SemEvalABSADatasetReader',
       url='https://github.com/sjebbara/SemEvalABSADatasetReader',
       # download_url='https://github.com/sjebbara/SemEvalABSADatasetReader/tarball/0.3.1',
       license='MIT',
-      install_requires=['bs4'],
+      install_requires=['bs4', "lxml"],
       packages=find_packages())

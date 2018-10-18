@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 from bs4 import BeautifulSoup
 
 __author__ = 'sjebbara'
@@ -5,9 +7,12 @@ __author__ = 'sjebbara'
 
 class Review:
     def __init__(self):
-        self.id = None
-        self.sentences = []
-        self.opinions = []
+        self.id = None  # type: str
+        self.sentences = []  # type:  List[Sentence]
+        self.opinions = []  # type:  List[Opinion]
+
+    def __repr__(self):
+        return str(self.__dict__)
 
     def __str__(self):
         s = u"--- Review [{}] ---".format(self.id)
@@ -19,16 +24,19 @@ class Review:
             s += u"\nText-Level Opinions:"
             for opinion in self.opinions:
                 s += u"\n  " + str(opinion)
-        return s.encode("utf-8")
+        return s
 
 
 class Sentence:
     def __init__(self):
-        self.review_id = None
-        self.id = None
-        self.text = None
-        self.out_of_scope = False
-        self.opinions = []
+        self.review_id = None  # type:  str
+        self.id = None  # type:  str
+        self.text = None  # type:  str
+        self.out_of_scope = False  # type:  bool
+        self.opinions = []  # type:  List[Sentence]
+
+    def __repr__(self):
+        return str(self.__dict__)
 
     def __str__(self):
         s = u"[{}]: '{}'".format(self.id, self.text)
@@ -37,28 +45,31 @@ class Sentence:
             for o in self.opinions:
                 s += u"\n  " + str(o)
             s += u"\n"
-        return s.encode("utf-8")
+        return s
 
 
 class Opinion:
     def __init__(self):
-        self.target = None
-        self.category = None
-        self.entity = None
-        self.attribute = None
-        self.polarity = None
-        self.start = None
-        self.end = None
+        self.target = None  # type:  Optional[str]
+        self.category = None  # type:  Optional[str]
+        self.entity = None  # type:  Optional[str]
+        self.attribute = None  # type:  Optional[str]
+        self.polarity = None  # type:  Optional[str]
+        self.start = None  # type:  int
+        self.end = None  # type:  int
+
+    def __repr__(self):
+        return str(self.__dict__)
 
     def __str__(self):
         if self.target:
             s = u"[{}; {}] '{}' ({}-{})".format(self.category, self.polarity, self.target, self.start, self.end)
         else:
             s = u"[{}; {}]".format(self.category, self.polarity)
-        return s.encode("utf-8")
+        return s
 
 
-def read_semeval2014_task4(filepath, aspect_terms=True, aspect_categories=True):
+def read_semeval2014_task4(filepath: str, aspect_terms: bool = True, aspect_categories: bool = True) -> List[Review]:
     reviews = []
     with open(filepath) as f:
         soup = BeautifulSoup(f, "xml")
@@ -128,7 +139,7 @@ def read_semeval2014_task4(filepath, aspect_terms=True, aspect_categories=True):
     return reviews
 
 
-def read_semeval2015_task12(filepath):
+def read_semeval2015_task12(filepath: str) -> List[Review]:
     reviews = []
     with open(filepath) as f:
         soup = BeautifulSoup(f, "xml")
@@ -149,12 +160,8 @@ def read_semeval2015_task12(filepath):
                     # category
                     try:
                         opinion.category = o_tag["category"]
-<<<<<<< HEAD
                         opinion.entity, opinion.attribute = opinion.category.split("#")
                     except (KeyError, ValueError):
-=======
-                    except KeyError:
->>>>>>> 56cd831b972820151a4820ba2f567e253cd3eec9
                         opinion.category = None
 
                     # entity + attribute
@@ -185,7 +192,7 @@ def read_semeval2015_task12(filepath):
     return reviews
 
 
-def read_semeval2016_task5_subtask1(filepath):
+def read_semeval2016_task5_subtask1(filepath: str) -> List[Review]:
     reviews = []
     with open(filepath) as f:
         soup = BeautifulSoup(f, "xml")
@@ -210,12 +217,8 @@ def read_semeval2016_task5_subtask1(filepath):
                     # category
                     try:
                         opinion.category = o_tag["category"]
-<<<<<<< HEAD
                         opinion.entity, opinion.attribute = opinion.category.split("#")
                     except (KeyError, ValueError):
-=======
-                    except KeyError:
->>>>>>> 56cd831b972820151a4820ba2f567e253cd3eec9
                         opinion.category = None
 
                     # entity + attribute
@@ -247,7 +250,7 @@ def read_semeval2016_task5_subtask1(filepath):
     return reviews
 
 
-def read_semeval2016_task5_subtask2(filepath):
+def read_semeval2016_task5_subtask2(filepath: str) -> List[Review]:
     reviews = []
     with open(filepath) as f:
         soup = BeautifulSoup(f, "xml")
@@ -269,12 +272,8 @@ def read_semeval2016_task5_subtask2(filepath):
                 # category
                 try:
                     opinion.category = o_tag["category"]
-<<<<<<< HEAD
                     opinion.entity, opinion.attribute = opinion.category.split("#")
                 except (KeyError, ValueError):
-=======
-                except KeyError:
->>>>>>> 56cd831b972820151a4820ba2f567e253cd3eec9
                     opinion.category = None
 
                 # entity + attribute

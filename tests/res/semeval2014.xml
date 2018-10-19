@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sentences>
+    <sentence id="1">
+        <text>This is a test sentence.</text>
+        <aspectTerms>
+            <aspectTerm term="sentence" polarity="neutral" from="15" to="23"/>
+        </aspectTerms>
+        <aspectCategories>
+            <aspectCategory category="TEST" polarity="negative"/>
+        </aspectCategories>
+    </sentence>
+    <sentence id="2">
+        <text>Another sentence for testing purposes</text>
+        <aspectTerms>
+            <aspectTerm term="sentence" polarity="positive" from="8" to="16"/>
+            <aspectTerm term="purposes" polarity="positive" from="29" to="37"/>
+        </aspectTerms>
+        <aspectCategories>
+            <aspectCategory category="PURPOSE" polarity="positive"/>
+            <aspectCategory category="ANOTHER" polarity="negative"/>
+        </aspectCategories>
+    </sentence>
+  </sentences>

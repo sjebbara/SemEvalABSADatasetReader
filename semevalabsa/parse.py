@@ -68,8 +68,8 @@ def read_semeval2014(filepath: str, aspect_terms: bool = True, aspect_categories
                         opinion.polarity = None
 
                     opinion.target = None
-                    opinion.start = 0
-                    opinion.end = 0
+                    opinion.start = None
+                    opinion.end = None
 
                     sentence.opinions.append(opinion)
 

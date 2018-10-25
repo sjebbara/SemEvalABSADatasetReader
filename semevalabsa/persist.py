@@ -1,5 +1,5 @@
+import html
 import re
-import xml
 from typing import TYPE_CHECKING
 
 from bs4 import BeautifulSoup
@@ -83,7 +83,7 @@ def write_2014_reviews(reviews: "Dataset", output_filepath: str):
                 for opinion in sentence:
                     if opinion.target is not None and opinion.start is not None and opinion.end is not None:
                         term_tag = dataset_soup.new_tag("aspectTerm")
-                        term_tag["term"] = xml.sax.saxutils.escape(opinion.target)
+                        term_tag["term"] = html.escape(opinion.target)
                         term_tag["from"] = opinion.start
                         term_tag["to"] = opinion.end
                         term_tag["polarity"] = opinion.polarity

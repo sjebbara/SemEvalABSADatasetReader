@@ -1,10 +1,13 @@
+import os
+
+from pytest import fixture
+
 from semevalabsa import read_semeval2014
 from semevalabsa.datatypes import Dataset, Review, Sentence, Opinion, DatasetFormat
 
 
-def test_semeval2014():
-    parsed_dataset = read_semeval2014("tests/res/semeval2014.xml", aspect_terms=True, aspect_categories=True)
-
+@fixture
+def semeval2014_dataset():
     r1 = Review(id="Review_1",
                 sentences=[
                     Sentence(review_id="Review_1", id="1", text="This is a test sentence.", out_of_scope=False,
@@ -24,5 +27,19 @@ def test_semeval2014():
                              ])
                 ])
     target_dataset = Dataset([r1, r2], dataset_format=DatasetFormat.SemEval2014)
+    return target_dataset
 
-    assert parsed_dataset == target_dataset
+
+def test_parsing_semeval2014(semeval2014_dataset):
+    parsed_dataset = read_semeval2014("tests/res/semeval2014.xml", aspect_terms=True, aspect_categories=True)
+
+    assert semeval2014_dataset == parsed_dataset
+
+
+def test_persist_and_parse_semeval2014(semeval2014_dataset):
+    tmp_dataset_filepath = ".tmp_semeval2014.xml"
+    semeval2014_dataset.to_file(tmp_dataset_filepath)
+    parsed_dataset = read_semeval2014(tmp_dataset_filepath, aspect_terms=True, aspect_categories=True)
+    os.remove(tmp_dataset_filepath)
+
+    assert semeval2014_dataset == parsed_dataset

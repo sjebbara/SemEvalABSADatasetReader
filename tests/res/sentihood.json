@@ -1,0 +1,29 @@
+[
+    {
+        "opinions": [
+            {
+                "sentiment": "Positive",
+                "aspect": "transit-location",
+                "target_entity": "LOCATION1"
+            }
+        ],
+        "id": 1244,
+        "text": "  And LOCATION1 is ten mins direct on the tube to LOCATION2:  "
+    },
+    {
+        "opinions": [
+            {
+                "sentiment": "Positive",
+                "aspect": "nightlife",
+                "target_entity": "LOCATION1"
+            },
+            {
+                "sentiment": "Positive",
+                "aspect": "transit-location",
+                "target_entity": "LOCATION1"
+            }
+        ],
+        "id": 209,
+        "text": "  Another option is LOCATION1 which is very central and has tons of clubs/bars within walking distance of each other"
+    }
+]

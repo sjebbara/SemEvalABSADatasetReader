@@ -12,6 +12,7 @@ class DatasetFormat:
     SemEval2014 = "semeval2014"
     SemEval2015 = "semeval2015"
     SemEval2016 = "semeval2016"
+    SentiHood = "sentihood"
 
 
 @attr.s

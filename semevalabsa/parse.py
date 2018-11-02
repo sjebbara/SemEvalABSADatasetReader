@@ -1,8 +1,51 @@
+import json
+
 from bs4 import BeautifulSoup
 
 from semevalabsa.datatypes import Review, Sentence, Opinion, Dataset, DatasetFormat
 
 __author__ = 'sjebbara'
+
+
+def read_sentihood(filepath: str) -> Dataset:
+    reviews = []
+    with open(filepath) as f:
+        json_dataset = json.load(f)
+
+        for json_sentence in json_dataset:
+            sentence = Sentence()
+            sentence.id = json_sentence["id"]
+
+            # dummy review
+            review = Review()
+            review.id = "Review_{}".format(sentence.id)
+            sentence.review_id = review.id
+
+            sentence.text = json_sentence["text"]
+
+            for json_opinion in json_sentence["opinions"]:
+                opinion = Opinion()
+
+                opinion.polarity = json_opinion["sentiment"]
+
+                opinion.category = json_opinion["aspect"]
+                opinion.entity = None
+                opinion.attribute = None
+
+                opinion.target = json_opinion["target_entity"]
+
+                try:
+                    opinion.start = sentence.text.index(opinion.target)
+                    opinion.end = opinion.start + len(opinion.target)
+                except ValueError as e:
+                    opinion.start = None
+                    opinion.end = None
+
+                sentence.opinions.append(opinion)
+
+            review.sentences.append(sentence)
+            reviews.append(review)
+    return Dataset(reviews, DatasetFormat.SentiHood)
 
 
 def read_semeval2014(filepath: str, aspect_terms: bool = True, aspect_categories: bool = True) -> Dataset:

@@ -2,7 +2,7 @@ import os
 
 from pytest import fixture
 
-from semevalabsa import read_semeval2014
+from semevalabsa import read_semeval2014, read_sentihood
 from semevalabsa.datatypes import Dataset, Review, Sentence, Opinion, DatasetFormat
 
 
@@ -43,3 +43,41 @@ def test_persist_and_parse_semeval2014(semeval2014_dataset):
     os.remove(tmp_dataset_filepath)
 
     assert semeval2014_dataset == parsed_dataset
+
+
+@fixture
+def sentihood_dataset():
+    r1 = Review(id="Review_1244",
+                sentences=[
+                    Sentence(review_id="Review_1244", id=1244, text="  And LOCATION1 is ten mins direct on the tube to LOCATION2:  ",
+                             out_of_scope=False,
+                             opinions=[
+                                 Opinion(target="LOCATION1", category="transit-location", polarity="Positive", start=6, end=15),
+                             ])
+                ])
+    r2 = Review(id="Review_209",
+                sentences=[
+                    Sentence(review_id="Review_209", id=209,
+                             text="  Another option is LOCATION1 which is very central and has tons of clubs/bars within walking distance of each other",
+                             out_of_scope=False,
+                             opinions=[
+                                 Opinion(target="LOCATION1", category="nightlife", polarity="Positive", start=20, end=29),
+                                 Opinion(target="LOCATION1", category="transit-location", polarity="Positive", start=20, end=29),
+                             ])
+                ])
+    target_dataset = Dataset([r1, r2], dataset_format=DatasetFormat.SentiHood)
+    return target_dataset
+
+
+def test_parsing_sentihood(sentihood_dataset):
+    parsed_dataset = read_sentihood("tests/res/sentihood.json")
+
+    assert sentihood_dataset == parsed_dataset
+
+# def test_persist_and_parse_sentihood(sentihood_dataset):
+#     tmp_dataset_filepath = ".tmp_sentihood.json"
+#     sentihood_dataset.to_file(tmp_dataset_filepath)
+#     parsed_dataset = read_sentihood("tests/res/sentihood.json")
+#     os.remove(tmp_dataset_filepath)
+#
+#     assert sentihood_dataset == parsed_dataset
